@@ -1,0 +1,12 @@
+{
+  "domain": "atmo_qualite_air",
+  "name": "Atmo Data (qualité de l'air)",
+  "codeowners": ["@MathildeDec"],
+  "config_flow": true,
+  "documentation": "https://github.com/Mathide-Team/atmo-qualite-air",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Mathide-Team/atmo-qualite-air/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
