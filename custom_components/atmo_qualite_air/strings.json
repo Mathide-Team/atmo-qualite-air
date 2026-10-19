@@ -1,0 +1,138 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Indices de qualité de l'air diffusés par les AASQA via Atmo Data (Atmo France). Un compte gratuit est nécessaire : https://admindata.atmo-france.org. Le territoire est un code INSEE de commune (Strasbourg : 67482) ou le SIREN d'une intercommunalité.",
+        "data": {
+          "username": "Identifiant Atmo Data",
+          "password": "Mot de passe",
+          "code_zone": "Code INSEE de la commune ou SIREN de l'EPCI"
+        }
+      },
+      "reauth_confirm": {
+        "description": "Atmo Data refuse les identifiants enregistrés. Saisissez-les à nouveau.",
+        "data": {
+          "username": "Identifiant Atmo Data",
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Identifiants refusés par Atmo Data.",
+      "cannot_connect": "Impossible de joindre Atmo Data.",
+      "zone_invalide": "Code attendu : 5 caractères (INSEE, 2A/2B pour la Corse) ou 9 chiffres (SIREN d'EPCI).",
+      "zone_inconnue": "Aucun indice diffusé pour ce territoire ces derniers jours : vérifiez le code."
+    },
+    "abort": {
+      "already_configured": "Ce territoire est déjà suivi.",
+      "reauth_successful": "Identifiants mis à jour."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "indice_atmo": {
+        "name": "Indice ATMO",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "indice_atmo_demain": {
+        "name": "Indice ATMO demain",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "sous_indice_no2": {
+        "name": "Sous-indice NO₂",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "sous_indice_o3": {
+        "name": "Sous-indice O₃",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "sous_indice_pm10": {
+        "name": "Sous-indice PM10",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "sous_indice_pm25": {
+        "name": "Sous-indice PM2,5",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "sous_indice_so2": {
+        "name": "Sous-indice SO₂",
+        "state": {
+          "absent": "Absent",
+          "bon": "Bon",
+          "moyen": "Moyen",
+          "degrade": "Dégradé",
+          "mauvais": "Mauvais",
+          "tres_mauvais": "Très mauvais",
+          "extremement_mauvais": "Extrêmement mauvais",
+          "evenement": "Événement"
+        }
+      },
+      "indice_pollen": {
+        "name": "Indice pollinique",
+        "state": {
+          "indisponible": "Indisponible",
+          "tres_faible": "Très faible",
+          "faible": "Faible",
+          "modere": "Modéré",
+          "eleve": "Élevé",
+          "tres_eleve": "Très élevé",
+          "extremement_eleve": "Extrêmement élevé"
+        }
+      }
+    }
+  }
+}
