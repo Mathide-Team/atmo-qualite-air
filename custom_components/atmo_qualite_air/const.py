@@ -13,6 +13,9 @@ CONF_CODE_ZONE = "code_zone"
 # couverte par une AASQA peut être suivie.
 DEFAULT_CODE_ZONE = "67482"
 
+# Création du compte gratuit (lien affiché à la configuration).
+URL_COMPTE = "https://admindata.atmo-france.org"
+
 # Les indices sont diffusés une fois par jour (vers 11 h et 14 h), avec
 # parfois une mise à jour l'après-midi : une heure suffit largement.
 UPDATE_INTERVAL_MIN = 60

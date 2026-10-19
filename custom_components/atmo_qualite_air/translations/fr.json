@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "description": "Indices de qualité de l'air diffusés par les AASQA via Atmo Data (Atmo France). Un compte gratuit est nécessaire : https://admindata.atmo-france.org. Le territoire est un code INSEE de commune (Strasbourg : 67482) ou le SIREN d'une intercommunalité.",
+        "description": "Indices de qualité de l'air diffusés par les AASQA via Atmo Data (Atmo France). Un compte gratuit est nécessaire : {url_compte}. Le territoire est un code INSEE de commune (Strasbourg : 67482) ou le SIREN d'une intercommunalité.",
         "data": {
           "username": "Identifiant Atmo Data",
           "password": "Mot de passe",

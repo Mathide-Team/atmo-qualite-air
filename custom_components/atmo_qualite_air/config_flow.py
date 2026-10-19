@@ -14,7 +14,7 @@ from homeassistant.helpers.selector import TextSelector, TextSelectorConfig, Tex
 from homeassistant.util import dt as dt_util
 
 from .api import AtmoApiError, AtmoAuthError, AtmoDataClient, code_zone_valide
-from .const import CONF_CODE_ZONE, DEFAULT_CODE_ZONE, DOMAIN
+from .const import CONF_CODE_ZONE, DEFAULT_CODE_ZONE, DOMAIN, URL_COMPTE
 
 _MOT_DE_PASSE = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 
@@ -72,7 +72,12 @@ class AtmoConfigFlow(ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_CODE_ZONE, default=defauts.get(CONF_CODE_ZONE, DEFAULT_CODE_ZONE)): str,
             }
         )
-        return self.async_show_form(step_id="user", data_schema=schema, errors=erreurs)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=schema,
+            errors=erreurs,
+            description_placeholders={"url_compte": URL_COMPTE},
+        )
 
     async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> ConfigFlowResult:
         """Identifiants refusés : demander un nouveau mot de passe."""

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "description": "Air quality indices published by the French AASQA networks through Atmo Data (Atmo France). A free account is required: https://admindata.atmo-france.org. The area is a French municipality INSEE code (Strasbourg: 67482) or the SIREN of an intercommunality (EPCI).",
+        "description": "Air quality indices published by the French AASQA networks through Atmo Data (Atmo France). A free account is required: {url_compte}. The area is a French municipality INSEE code (Strasbourg: 67482) or the SIREN of an intercommunality (EPCI).",
         "data": {
           "username": "Atmo Data username",
           "password": "Password",
