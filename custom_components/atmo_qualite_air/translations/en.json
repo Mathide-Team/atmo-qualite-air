@@ -1,0 +1,138 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Air quality indices published by the French AASQA networks through Atmo Data (Atmo France). A free account is required: {url_compte}. The area is a French municipality INSEE code (Strasbourg: 67482) or the SIREN of an intercommunality (EPCI).",
+        "data": {
+          "username": "Atmo Data username",
+          "password": "Password",
+          "code_zone": "Municipality INSEE code or EPCI SIREN"
+        }
+      },
+      "reauth_confirm": {
+        "description": "Atmo Data rejected the stored credentials. Please enter them again.",
+        "data": {
+          "username": "Atmo Data username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Credentials rejected by Atmo Data.",
+      "cannot_connect": "Unable to reach Atmo Data.",
+      "zone_invalide": "Expected: 5 characters (INSEE, 2A/2B for Corsica) or 9 digits (EPCI SIREN).",
+      "zone_inconnue": "No index published for this area in the last days: check the code."
+    },
+    "abort": {
+      "already_configured": "This area is already monitored.",
+      "reauth_successful": "Credentials updated."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "indice_atmo": {
+        "name": "ATMO index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "indice_atmo_demain": {
+        "name": "ATMO index tomorrow",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "sous_indice_no2": {
+        "name": "NO₂ sub-index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "sous_indice_o3": {
+        "name": "O₃ sub-index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "sous_indice_pm10": {
+        "name": "PM10 sub-index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "sous_indice_pm25": {
+        "name": "PM2.5 sub-index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "sous_indice_so2": {
+        "name": "SO₂ sub-index",
+        "state": {
+          "absent": "Absent",
+          "bon": "Good",
+          "moyen": "Fair",
+          "degrade": "Degraded",
+          "mauvais": "Poor",
+          "tres_mauvais": "Very poor",
+          "extremement_mauvais": "Extremely poor",
+          "evenement": "Event"
+        }
+      },
+      "indice_pollen": {
+        "name": "Pollen index",
+        "state": {
+          "indisponible": "Unavailable",
+          "tres_faible": "Very low",
+          "faible": "Low",
+          "modere": "Moderate",
+          "eleve": "High",
+          "tres_eleve": "Very high",
+          "extremement_eleve": "Extremely high"
+        }
+      }
+    }
+  }
+}

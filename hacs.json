@@ -1,0 +1,7 @@
+{
+  "name": "Atmo Data (qualité de l'air)",
+  "render_readme": true,
+  "homeassistant": "2026.3.0",
+  "zip_release": true,
+  "filename": "atmo_qualite_air.zip"
+}
