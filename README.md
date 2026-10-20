@@ -96,7 +96,7 @@ automation:
 
 ## Développement
 
-Socle qualité [Mathide-Team](https://github.com/Mathide-Team/.github/blob/main/SOCLE.md) :
+Socle qualité [Mathilde-Team](https://github.com/Mathilde-Team/.github/blob/main/SOCLE.md) :
 PR vers `dev`, livraison par PR `dev` → `main`.
 
 ```bash
