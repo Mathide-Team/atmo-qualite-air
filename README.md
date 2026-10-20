@@ -1,3 +1,7 @@
+> **Dépôt archivé le 20/10/2026** — cette intégration n'est plus maintenue.
+> Remplacée par [sebcaps/atmofrance](https://github.com/sebcaps/atmofrance) (référence installée, liste HACS par défaut).
+> Nos idées d'amélioration ont été proposées en amont : [atmofrance#70](https://github.com/sebcaps/atmofrance/issues/70). Mémoire du projet : Mathilde-Team/integrations-archivees.
+
 # Atmo Data (qualité de l'air)
 
 Intégration Home Assistant qui suit l'**indice ATMO** de qualité de l'air
