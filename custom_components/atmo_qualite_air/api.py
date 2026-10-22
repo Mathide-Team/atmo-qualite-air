@@ -117,8 +117,8 @@ def _proprietes(donnees: Any) -> list[dict[str, Any]]:
     """Propriétés des entités d'une FeatureCollection, contrôle de forme."""
     LOGGER.debug("_proprietes() appelée")
     if not isinstance(donnees, dict) or not isinstance(donnees.get("features"), list):
-        LOGGER.debug("réponse inattendue : FeatureCollection attendue")
         msg = "Réponse Atmo Data inattendue (FeatureCollection attendue)"
+        LOGGER.debug("réponse inattendue : FeatureCollection attendue")
         raise AtmoApiError(msg)
     proprietes = [f.get("properties") or {} for f in donnees["features"] if isinstance(f, dict)]
     LOGGER.debug("_proprietes() retourne %s entité(s)", len(proprietes))
@@ -218,27 +218,27 @@ class AtmoDataClient:
                 url, json={"username": self._username, "password": self._password}
             ) as response:
                 if response.status in (400, 401, 403):
-                    LOGGER.debug("identifiants refusés (statut %s)", response.status)
                     msg = "Identifiants Atmo Data refusés"
+                    LOGGER.debug("identifiants refusés (statut %s)", response.status)
                     raise AtmoAuthError(msg)
                 response.raise_for_status()
                 donnees = await response.json(content_type=None)
         except ClientResponseError as erreur:
-            LOGGER.debug("Atmo Data a répondu %s à la connexion", erreur.status)
             msg = f"Atmo Data a répondu {erreur.status} à la connexion"
+            LOGGER.debug("Atmo Data a répondu %s à la connexion", erreur.status)
             raise AtmoApiError(msg) from erreur
         except (ClientError, TimeoutError) as erreur:
-            LOGGER.debug("Atmo Data injoignable (connexion) : %s", erreur)
             msg = "Atmo Data est injoignable (connexion)"
+            LOGGER.debug("Atmo Data injoignable (connexion) : %s", erreur)
             raise AtmoApiError(msg) from erreur
         except ValueError as erreur:
-            LOGGER.debug("réponse illisible d'Atmo Data (connexion) : %s", erreur)
             msg = "Réponse illisible d'Atmo Data (connexion)"
+            LOGGER.debug("réponse illisible d'Atmo Data (connexion) : %s", erreur)
             raise AtmoApiError(msg) from erreur
         jeton = donnees.get("token") if isinstance(donnees, dict) else None
         if not jeton:
-            LOGGER.debug("aucun jeton dans la réponse d'Atmo Data")
             msg = "Atmo Data n'a pas renvoyé de jeton"
+            LOGGER.debug("aucun jeton dans la réponse d'Atmo Data")
             raise AtmoApiError(msg)
         self._jeton = str(jeton)
         LOGGER.debug("async_login() retourne (jeton obtenu)")
@@ -257,24 +257,24 @@ class AtmoDataClient:
                 if response.status == 401:
                     self._jeton = None
                     if not relance:
-                        LOGGER.debug("jeton refusé après reconnexion (%s)", chemin)
                         msg = "Jeton Atmo Data refusé après reconnexion"
+                        LOGGER.debug("jeton refusé après reconnexion (%s)", chemin)
                         raise AtmoAuthError(msg)
                 else:
                     response.raise_for_status()
                     LOGGER.debug("_async_get_json() retourne la réponse (%s)", chemin)
                     return await response.json(content_type=None)
         except ClientResponseError as erreur:
-            LOGGER.debug("Atmo Data a répondu %s pour %s", erreur.status, chemin)
             msg = f"Atmo Data a répondu {erreur.status} pour {chemin}"
+            LOGGER.debug("Atmo Data a répondu %s pour %s", erreur.status, chemin)
             raise AtmoApiError(msg) from erreur
         except (ClientError, TimeoutError) as erreur:
-            LOGGER.debug("Atmo Data injoignable (%s) : %s", chemin, erreur)
             msg = f"Atmo Data est injoignable ({chemin})"
+            LOGGER.debug("Atmo Data injoignable (%s) : %s", chemin, erreur)
             raise AtmoApiError(msg) from erreur
         except ValueError as erreur:
-            LOGGER.debug("réponse illisible d'Atmo Data (%s) : %s", chemin, erreur)
             msg = f"Réponse illisible d'Atmo Data ({chemin})"
+            LOGGER.debug("réponse illisible d'Atmo Data (%s) : %s", chemin, erreur)
             raise AtmoApiError(msg) from erreur
         # Jeton expiré : reconnexion puis une seule nouvelle tentative.
         LOGGER.debug("_async_get_json() relance une fois après reconnexion (%s)", chemin)

@@ -134,8 +134,6 @@ class AtmoSensor(CoordinatorEntity[AtmoCoordinator], SensorEntity):
 
     def __init__(self, coordinator: AtmoCoordinator, description: AtmoSensorDescription) -> None:
         LOGGER.debug("AtmoSensor.__init__() appelé | zone=%s", coordinator.code_zone)
-        libelle_capteur = description.key
-        LOGGER.debug("AtmoSensor.__init__() | capteur=%s", libelle_capteur)
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_options = list(description.qualificatifs.values())

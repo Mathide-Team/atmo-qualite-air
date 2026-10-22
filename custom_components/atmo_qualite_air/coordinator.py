@@ -69,8 +69,8 @@ class AtmoCoordinator(DataUpdateCoordinator[AtmoData]):
             LOGGER.debug("authentification refusée (%s) : %s", self.code_zone, erreur)
             raise ConfigEntryAuthFailed(str(erreur)) from erreur
         except AtmoError as erreur:
-            LOGGER.debug("mise à jour impossible (%s) : %s", self.code_zone, erreur)
             msg = f"Mise à jour impossible : {erreur}"
+            LOGGER.debug("mise à jour impossible (%s) : %s", self.code_zone, erreur)
             raise UpdateFailed(msg) from erreur
         pollen: IndicePollen | None = None
         try:
