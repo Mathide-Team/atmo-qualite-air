@@ -6,11 +6,23 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.atmo_qualite_air.api import AtmoDataClient
 from custom_components.atmo_qualite_air.const import CONF_CODE_ZONE, DOMAIN
+from custom_components.atmo_qualite_air.coordinator import AtmoCoordinator
+from custom_components.atmo_qualite_air.sensor import DESCRIPTIONS, AtmoSensor
 
-from .fausse_api import IDENTIFIANT, MOT_DE_PASSE, ZONE, ZONE_PANNE_POLLEN, ZONE_SANS_POLLEN, Etat
+from .fausse_api import (
+    IDENTIFIANT,
+    MOT_DE_PASSE,
+    ZONE,
+    ZONE_PANNE_POLLEN,
+    ZONE_SANS_DEMAIN,
+    ZONE_SANS_POLLEN,
+    Etat,
+)
 
 
 async def _demarrer(hass: HomeAssistant, zone: str = ZONE) -> MockConfigEntry:
@@ -119,3 +131,47 @@ async def test_dechargement(hass: HomeAssistant, serveur) -> None:
     entree = await _demarrer(hass)
     assert await hass.config_entries.async_unload(entree.entry_id)
     assert entree.state is ConfigEntryState.NOT_LOADED
+
+
+async def test_prevision_du_lendemain_absente(hass: HomeAssistant, serveur) -> None:
+    """Prévision du lendemain pas encore diffusée : capteur inconnu, sans attributs d'indice."""
+    await _demarrer(hass, ZONE_SANS_DEMAIN)
+    assert _etat(hass, "indice_atmo", ZONE_SANS_DEMAIN).state == "moyen"
+    demain = _etat(hass, "indice_atmo_demain", ZONE_SANS_DEMAIN)
+    assert demain.state == STATE_UNKNOWN
+    assert "code" not in demain.attributes
+    assert "date_echeance" not in demain.attributes
+
+
+async def test_pollens_refuses_declenchent_reauth(hass: HomeAssistant, serveur, etat: Etat) -> None:
+    """Pollens refusés même après reconnexion : réauthentification, pas un simple avertissement.
+
+    Contrairement à une panne du flux pollinique (secondaire, ignorée), un
+    refus d'authentification doit remonter à l'utilisateur.
+    """
+    entree = await _demarrer(hass)
+    assert entree.state is ConfigEntryState.LOADED
+    etat.refuser_pollens = True
+    await entree.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert entree.runtime_data.last_update_success is False
+    flux = hass.config_entries.flow.async_progress()
+    assert any(f["context"]["source"] == "reauth" for f in flux)
+
+
+async def test_capteur_avant_toute_donnee(hass: HomeAssistant) -> None:
+    """Avant la première mise à jour (data None) : ni valeur ni attribut, sans exception."""
+    entree = MockConfigEntry(
+        domain=DOMAIN,
+        title="Ville de test",
+        unique_id=ZONE,
+        data={"username": IDENTIFIANT, "password": MOT_DE_PASSE, CONF_CODE_ZONE: ZONE},
+    )
+    entree.add_to_hass(hass)
+    client = AtmoDataClient(async_get_clientsession(hass), IDENTIFIANT, MOT_DE_PASSE)
+    coordinateur = AtmoCoordinator(hass, entree, client, ZONE)
+    assert coordinateur.data is None
+    for description in DESCRIPTIONS:
+        capteur = AtmoSensor(coordinateur, description)
+        assert capteur.native_value is None
+        assert capteur.extra_state_attributes == {}
