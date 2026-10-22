@@ -14,7 +14,7 @@ from homeassistant.components.sensor import (
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, POLLUANTS, QUALIFICATIFS_ATMO, QUALIFICATIFS_POLLEN, TAXONS
+from .const import DOMAIN, LOGGER, POLLUANTS, QUALIFICATIFS_ATMO, QUALIFICATIFS_POLLEN, TAXONS
 from .coordinator import AtmoCoordinator, AtmoData
 
 if TYPE_CHECKING:
@@ -34,8 +34,11 @@ class AtmoSensorDescription(SensorEntityDescription):
 
 
 def _attributs_indice(indice: Any) -> dict[str, Any]:
+    LOGGER.debug("_attributs_indice() appelée | indice=%s", indice is not None)
     if indice is None:
+        LOGGER.debug("_attributs_indice() retourne un dictionnaire vide")
         return {}
+    LOGGER.debug("_attributs_indice() retourne les attributs")
     return {
         "code": indice.code_qual,
         "libelle": indice.lib_qual,
@@ -48,9 +51,12 @@ def _attributs_indice(indice: Any) -> dict[str, Any]:
 
 
 def _attributs_pollen(donnees: AtmoData) -> dict[str, Any]:
+    LOGGER.debug("_attributs_pollen() appelée | pollen=%s", donnees.pollen is not None)
     pollen = donnees.pollen
     if pollen is None:
+        LOGGER.debug("_attributs_pollen() retourne un dictionnaire vide")
         return {}
+    LOGGER.debug("_attributs_pollen() retourne les attributs")
     return {
         "code": pollen.code_qual,
         "libelle": pollen.lib_qual,
@@ -64,9 +70,12 @@ def _attributs_pollen(donnees: AtmoData) -> dict[str, Any]:
 
 
 def _sous_indice(polluant: str) -> Callable[[AtmoData], int | None]:
+    LOGGER.debug("_sous_indice() appelée | polluant=%s", polluant)
+
     def lire(donnees: AtmoData) -> int | None:
         return donnees.aujourdhui.sous_indices.get(polluant) if donnees.aujourdhui else None
 
+    LOGGER.debug("_sous_indice() retourne le lecteur de sous-indice")
     return lire
 
 
@@ -110,8 +119,10 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Crée les capteurs de la zone suivie."""
+    LOGGER.debug("async_setup_entry() (capteurs) appelé")
     coordinateur = entry.runtime_data
     async_add_entities(AtmoSensor(coordinateur, description) for description in DESCRIPTIONS)
+    LOGGER.debug("async_setup_entry() (capteurs) retourne | %s capteur(s)", len(DESCRIPTIONS))
 
 
 class AtmoSensor(CoordinatorEntity[AtmoCoordinator], SensorEntity):
@@ -122,6 +133,7 @@ class AtmoSensor(CoordinatorEntity[AtmoCoordinator], SensorEntity):
     entity_description: AtmoSensorDescription
 
     def __init__(self, coordinator: AtmoCoordinator, description: AtmoSensorDescription) -> None:
+        LOGGER.debug("AtmoSensor.__init__() appelé | zone=%s", coordinator.code_zone)
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_options = list(description.qualificatifs.values())
@@ -135,19 +147,27 @@ class AtmoSensor(CoordinatorEntity[AtmoCoordinator], SensorEntity):
             entry_type=DeviceEntryType.SERVICE,
             configuration_url="https://www.atmo-france.org",
         )
+        LOGGER.debug("AtmoSensor.__init__() retourne")
 
     @property
     def native_value(self) -> str | None:
         """Clé du qualificatif ; None si l'indice n'est pas (encore) diffusé."""
+        LOGGER.debug("native_value() appelé")
         if self.coordinator.data is None:
+            LOGGER.debug("native_value() retourne None (pas de données)")
             return None
         code = self.entity_description.code(self.coordinator.data)
         if code is None:
+            LOGGER.debug("native_value() retourne None (indice absent)")
             return None
+        LOGGER.debug("native_value() retourne le qualificatif")
         return self.entity_description.qualificatifs.get(code)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
+        LOGGER.debug("extra_state_attributes() appelé")
         if self.coordinator.data is None:
+            LOGGER.debug("extra_state_attributes() retourne un dictionnaire vide")
             return {}
+        LOGGER.debug("extra_state_attributes() retourne les attributs")
         return self.entity_description.attributs(self.coordinator.data)

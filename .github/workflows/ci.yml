@@ -40,7 +40,7 @@ jobs:
           uv run --only-group lint ruff format --check .
 
       - name: Tests (pytest, Home Assistant)
-        run: uv run -p 3.13 --only-group test pytest --cov --cov-report=term-missing
+        run: uv run -p 3.13 --group test --group scripts pytest --cov --cov-report=term-missing
 
   homeassistant:
     name: Validation Home Assistant (hassfest, HACS)
