@@ -14,6 +14,7 @@ ZONE = "67482"
 ZONE_SANS_POLLEN = "67218"
 ZONE_PANNE_POLLEN = "68066"
 ZONE_HORS = "99999"
+ZONE_SANS_DEMAIN = "25056"
 
 
 def indice(code_zone: str, echeance: date, code: int, diffusion: date, **sous: int) -> dict[str, Any]:
@@ -88,6 +89,7 @@ class Etat:
     json_invalide: bool = False
     expirer_prochain: bool = False
     refuser_toujours: bool = False
+    refuser_pollens: bool = False
     requetes: list[dict[str, str]] = field(default_factory=list)
 
 
@@ -131,10 +133,15 @@ def construire_app(etat: Etat) -> web.Application:
                 # Autre zone renvoyée par erreur : ignorée.
                 indice("00000", j0, 1, j0),
             ]
+        if zone == ZONE_SANS_DEMAIN:
+            # Prévision du lendemain pas encore diffusée.
+            entites = [e for e in entites if e["properties"]["date_ech"] != j1.isoformat()]
         return web.json_response({"type": "FeatureCollection", "features": entites})
 
     async def pollens(request: web.Request) -> web.Response:
-        if not _autorise(request):
+        # refuser_pollens : jeton valable pour les indices ATMO mais refusé
+        # pour les pollens, même après reconnexion (droits du compte).
+        if etat.refuser_pollens or not _autorise(request):
             return web.json_response({"code": 401}, status=401)
         zone = request.query.get("code_zone", "")
         if zone == ZONE_PANNE_POLLEN:

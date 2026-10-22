@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
 
 import pytest
-from aiohttp import ClientSession
+from aiohttp import ClientSession, web
+from aiohttp.test_utils import TestClient, TestServer
 
 from custom_components.atmo_qualite_air import api
 from custom_components.atmo_qualite_air.api import (
@@ -15,7 +16,7 @@ from custom_components.atmo_qualite_air.api import (
     code_zone_valide,
 )
 
-from .fausse_api import IDENTIFIANT, MOT_DE_PASSE, ZONE, ZONE_HORS, ZONE_SANS_POLLEN, Etat
+from .fausse_api import IDENTIFIANT, MOT_DE_PASSE, ZONE, ZONE_HORS, ZONE_SANS_POLLEN, Etat, construire_app
 
 
 @pytest.fixture
@@ -133,3 +134,106 @@ async def test_pollens(serveur, etat: Etat, session) -> None:
 async def test_pollens_absents(serveur, etat: Etat, session) -> None:
     j0 = etat.aujourdhui
     assert await _client(session).async_get_pollens(ZONE_SANS_POLLEN, j0, j0) == {}
+
+
+@pytest.mark.parametrize(
+    ("valeur", "attendu"),
+    [(None, None), ("", None), ("4", 4), (3, 3), ("abc", None), ([1], None)],
+)
+def test_entier(valeur: object, attendu: int | None) -> None:
+    """Code entier ou chaîne ; None si absent ou illisible (jamais d'exception)."""
+    assert api._entier(valeur) == attendu
+
+
+@pytest.mark.parametrize(
+    ("valeur", "attendu"),
+    [(None, None), ("1.5", 1.5), (11, 11.0), ("x", None), ([1], None)],
+)
+def test_flottant(valeur: object, attendu: float | None) -> None:
+    """Concentration flottante ; None si absente ou illisible."""
+    assert api._flottant(valeur) == attendu
+
+
+@pytest.mark.parametrize("valeur", ["pas une date", None, "2026-13-01"])
+def test_date_illisible(valeur: object) -> None:
+    """Une date illisible devient None au lieu de lever."""
+    assert api._date(valeur) is None
+
+
+@pytest.mark.parametrize(
+    "donnees",
+    [
+        pytest.param([], id="liste"),
+        pytest.param({"type": "FeatureCollection"}, id="sans-features"),
+        pytest.param({"features": {"a": 1}}, id="features-non-liste"),
+    ],
+)
+def test_proprietes_forme_inattendue(donnees: object) -> None:
+    """Tout ce qui n'est pas une FeatureCollection devient AtmoApiError."""
+    with pytest.raises(AtmoApiError, match="FeatureCollection attendue"):
+        api._proprietes(donnees)
+
+
+def test_proprietes_entites_non_dict_ignorees() -> None:
+    """Les entités qui ne sont pas des objets sont ignorées ; propriétés absentes → {}."""
+    assert api._proprietes({"features": ["bruit", {"properties": {"a": 1}}, {}]}) == [{"a": 1}, {}]
+
+
+def test_plus_recente_garde_la_diffusion_la_plus_fraiche() -> None:
+    """Une diffusion plus ancienne qui arrive après la récente ne la remplace pas.
+
+    Les entités sans échéance lisible ou sans code de qualité sont écartées.
+    """
+    j0 = date(2026, 10, 22)
+    recente = {"code_zone": ZONE, "date_ech": j0.isoformat(), "code_qual": 2, "date_dif": "2026-10-22"}
+    ancienne = {"code_zone": ZONE, "date_ech": j0.isoformat(), "code_qual": 3, "date_dif": "2026-10-21"}
+    sans_code = {"code_zone": ZONE, "date_ech": "2026-10-23", "code_qual": None}
+    sans_date = {"code_zone": ZONE, "date_ech": "illisible", "code_qual": 1}
+    retenues = api._plus_recente_par_echeance([recente, ancienne, sans_code, sans_date], ZONE)
+    assert retenues == {j0: recente}
+
+
+def _serveur_connexion(reponse: web.Response) -> TestClient:
+    async def login(request: web.Request) -> web.Response:
+        return reponse
+
+    app = web.Application()
+    app.router.add_post("/api/login", login)
+    return TestClient(TestServer(app))
+
+
+@pytest.mark.parametrize(
+    ("reponse", "message"),
+    [
+        pytest.param(lambda: web.Response(status=500), "a répondu 500 à la connexion", id="http-500"),
+        pytest.param(
+            lambda: web.Response(text="<html>maintenance</html>", content_type="text/html"),
+            r"Réponse illisible d'Atmo Data \(connexion\)",
+            id="json-illisible",
+        ),
+        pytest.param(lambda: web.json_response({"code": 200}), "pas renvoyé de jeton", id="sans-jeton"),
+        pytest.param(lambda: web.json_response(["jeton"]), "pas renvoyé de jeton", id="liste"),
+        pytest.param(lambda: web.json_response({"token": ""}), "pas renvoyé de jeton", id="jeton-vide"),
+    ],
+)
+async def test_connexion_reponse_invalide(session, reponse, message: str) -> None:
+    """Toute connexion sans jeton exploitable devient AtmoApiError (pas AtmoAuthError)."""
+    serveur = _serveur_connexion(reponse())
+    await serveur.start_server()
+    try:
+        client = AtmoDataClient(session, IDENTIFIANT, MOT_DE_PASSE, base_url=str(serveur.make_url("/")))
+        with pytest.raises(AtmoApiError, match=message):
+            await client.async_login()
+    finally:
+        await serveur.close()
+
+
+async def test_serveur_perdu_apres_connexion(etat: Etat, session) -> None:
+    """Atmo Data injoignable entre la connexion et la requête : AtmoApiError explicite."""
+    serveur = TestClient(TestServer(construire_app(etat)))
+    await serveur.start_server()
+    client = AtmoDataClient(session, IDENTIFIANT, MOT_DE_PASSE, base_url=str(serveur.make_url("/")))
+    await client.async_login()
+    await serveur.close()
+    with pytest.raises(AtmoApiError, match=r"injoignable \(api/v2/data/indices/atmo\)"):
+        await client.async_get_indices(ZONE, etat.aujourdhui, etat.aujourdhui)
