@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import AtmoDataClient
-from .const import CONF_CODE_ZONE
+from .const import CONF_CODE_ZONE, LOGGER
 from .coordinator import AtmoCoordinator
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
@@ -18,6 +18,7 @@ type AtmoConfigEntry = ConfigEntry[AtmoCoordinator]
 
 async def async_setup_entry(hass: HomeAssistant, entry: AtmoConfigEntry) -> bool:
     """Crée le client et le coordinateur de la zone, puis les capteurs."""
+    LOGGER.debug("async_setup_entry() appelé | zone=%s", entry.data[CONF_CODE_ZONE])
     client = AtmoDataClient(
         async_get_clientsession(hass),
         entry.data[CONF_USERNAME],
@@ -28,6 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AtmoConfigEntry) -> bool
     await coordinateur.async_config_entry_first_refresh()
     entry.runtime_data = coordinateur
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    LOGGER.debug("async_setup_entry() retourne True")
     return True
 
 
