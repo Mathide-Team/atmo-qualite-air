@@ -1,6 +1,6 @@
 [project]
 name = "atmo-qualite-air"
-version = "0.1.0"
+version = "0.1.1"
 description = "Indices de qualité de l'air Atmo Data pour Home Assistant"
 requires-python = ">=3.13.2,<3.14"
 license = "MIT"

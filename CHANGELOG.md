@@ -1,5 +1,16 @@
 # Journal des versions
 
+## [0.1.1] — 22/10/2026
+
+- Workflow de release avec le Python de uv (python3 du runner trop
+  ancien) (#4).
+- Liens et manifest corrigés après le renommage de l'organisation en
+  Mathilde-Team.
+- Journal de debug complet (SOCLE §8) : entrée et sortie de chaque
+  fonction de l'intégration tracées ; scripts journalisés avec loguru.
+- Avis en tête du README : développement arrêté, sources conservées.
+- Tests : couverture 100 % lignes et branches, seuil bloquant à 95 % (#13).
+
 ## [0.1.0] — 19/10/2026
 
 - Version initiale : indice ATMO du jour et de demain, sous-indices NO₂,
